@@ -20,7 +20,7 @@ server.listen(8080, function(){
 
 const wsServer = new WebsocketServer({
     httpServer: server,
-    autoAcceptConnections: false
+    autoAcceptConnections: true
 });
 
 function originalIsAllowed(origin: string){
@@ -33,14 +33,15 @@ wsServer.on('request', function(request){
         console.log((new Date())+ 'Connection from Origin '+ request.origin + ' rejected.');
         return;
     }
-    var connection = request.accept('echo-protocol', request.origin);
+    const connection = request.accept('echo-protocol', request.origin);
     console.log((new Date()) + 'Connection accepted.');
     connection.on('message', function(message){
         if(message.type === 'utf8'){
             try{
+                console.log('Indie with message '+ message.utf8Data)
                 messageHandler(connection, JSON.parse(message.utf8Data));
             } catch(e){
-
+                console.error('Failed to handle message', e);
             }
         }
     })
